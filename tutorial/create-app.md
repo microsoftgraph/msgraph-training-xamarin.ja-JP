@@ -1,33 +1,32 @@
 <!-- markdownlint-disable MD002 MD041 -->
 
-Visual Studio を開き、[ **File > New > Project**] を選択します。 [**新しいプロジェクト**] ダイアログボックスで、次の操作を行います。
+Visual Studio を開き、[**新しいプロジェクトの作成**] を選択します。 [**新しいプロジェクトの作成**] ダイアログで、[**モバイルアプリ (Xamarin)**] を選択し、[**次へ**] をクリックします。
 
-1. [ **Visual C# > クロスプラットフォーム**] を選択します。
-1. [**モバイルアプリ] (Xamarin)** を選択します。
-1. プロジェクトの名前として「 **graphtutorial** 」と入力します。
+![Visual Studio 2019 [新しいプロジェクトの作成] ダイアログ](images/new-project-dialog.png)
 
-![Visual Studio 2017 [新しいプロジェクトの作成] ダイアログ](images/new-project-dialog.png)
+[**新しいプロジェクトの構成**] ダイアログで、 `GraphTutorial` **プロジェクト名**と**ソリューション名**を入力し、[**作成**] を選択します。
 
 > [!IMPORTANT]
 > これらのラボ手順で指定した Visual Studio プロジェクトに対して、まったく同じ名前を入力してください。 Visual Studio プロジェクト名は、コード内の名前空間の一部になります。 これらの手順内のコードは、この手順で指定した Visual Studio プロジェクト名に一致する名前空間によって決まります。 別のプロジェクト名を使用すると、プロジェクトの作成時に入力した Visual Studio プロジェクト名と一致するようにすべての名前空間を調整しない限り、コードはコンパイルされません。
 
-**[OK]** を選択します。 [**クロスプラットフォームアプリの新規作成**] ダイアログで **、空**のテンプレートを選択し、**コード共有戦略**の選択が **.net Standard**であることを確認します。 特定のプラットフォームをスキップすることを計画している場合は、[**プラットフォーム**] の下で選択を解除できます。 [ **OK]** を選択してソリューションを作成します。
+![Visual Studio 2019 [新しいプロジェクトの構成] ダイアログ](images/configure-new-project-dialog.png)
 
-![Visual Studio 2017 の [クロスプラットフォームアプリの新規作成] ダイアログ](images/new-cross-platform-app-dialog.png)
+[**クロスプラットフォームアプリの新規作成**] ダイアログで、**空**のテンプレートを選択し、**プラットフォーム**の下で構築するプラットフォームを選択します。 [ **OK]** を選択してソリューションを作成します。
+
+![Visual Studio 2019 の [クロスプラットフォームアプリの新規作成] ダイアログ](images/new-cross-platform-app-dialog.png)
 
 に進む前に、後で使用する追加の NuGet パッケージをインストールします。
 
 - Azure AD 認証とトークン管理を処理するための[クライアント](https://www.nuget.org/packages/Microsoft.Identity.Client/)。
-- microsoft graph に電話をかけるための[グラフ](https://www.nuget.org/packages/Microsoft.Graph/)です。
+- Microsoft Graph に電話をかけるための[グラフ](https://www.nuget.org/packages/Microsoft.Graph/)です。
 
-[**ツール > NuGet パッケージマネージャー > パッケージマネージャーコンソール**] を選択します。 パッケージマネージャーコンソールで、次のコマンドを入力します。
+[**ツール _GT_ NuGet パッケージマネージャー _GT_ パッケージマネージャーコンソール**] を選択します。 パッケージマネージャーコンソールで、次のコマンドを入力します。
 
 ```Powershell
-Install-Package Microsoft.Identity.Client -Version 2.7.0 -Project GraphTutorial
-Install-Package Xamarin.Android.Support.Compat -Version 27.0.2.1 -Project GraphTutorial.Android
-Install-Package Microsoft.Identity.Client -Version 2.7.0 -Project GraphTutorial.Android
-Install-Package Microsoft.Identity.Client -Version 2.7.0 -Project GraphTutorial.iOS
-Install-Package Microsoft.Graph -Version 1.12.0 -Project GraphTutorial
+Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial
+Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial.Android
+Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial.iOS
+Install-Package Microsoft.Graph -Version 1.15.0 -Project GraphTutorial
 ```
 
 ## <a name="design-the-app"></a>アプリを設計する
@@ -142,7 +141,7 @@ private Stream GetUserPhoto()
 
 次に、アプリケーションのメインページを[マスター/詳細ページ](/xamarin/xamarin-forms/app-fundamentals/navigation/master-detail-page)に変更します。 これにより、アプリの表示を切り替えるナビゲーションメニューが提供されます。
 
-**graphtutorial**プロジェクトで**MainPage**ファイルを開き、その内容を次のように置き換えます。
+**Graphtutorial**プロジェクトで**MainPage**ファイルを開き、その内容を次のように置き換えます。
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -168,7 +167,7 @@ private Stream GetUserPhoto()
 
 #### <a name="implement-the-menu"></a>メニューを実装する
 
-最初に、メニュー項目を表すためのモデルを作成します。 **graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいフォルダー**] の順に選択します。 フォルダー `Models`に名前を指定します。
+最初に、メニュー項目を表すためのモデルを作成します。 **Graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいフォルダー**] の順に選択します。 フォルダー `Models`に名前を指定します。
 
 [**モデル**] フォルダーを右クリックし、[**追加**]、[**クラス.**..] の順に選択します。クラス`NavMenuItem`の名前を指定して、[**追加**] を選択します。 **NavMenuItem.cs**ファイルを開き、その内容を次のように置き換えます。
 
@@ -190,7 +189,7 @@ namespace GraphTutorial.Models
 }
 ```
 
-次に、メニューページを追加します。 **graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいアイテム**] の順に選択します。[**コンテンツ] ページ**を選択し`MenuPage`、ページに名前を指定します。 **[追加]** を選択します。 **MenuPage**ファイルを開き、その内容を次のように置き換えます。
+次に、メニューページを追加します。 **Graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいアイテム**] の順に選択します。[**コンテンツ] ページ**を選択し`MenuPage`、ページに名前を指定します。 **[追加]** を選択します。 **MenuPage**ファイルを開き、その内容を次のように置き換えます。
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -275,7 +274,7 @@ namespace GraphTutorial
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MenuPage : ContentPage
     {
-        MainPage RootPage { get => Application.Current.MainPage as MainPage; }
+        MainPage RootPage => Application.Current.MainPage as MainPage;
         List<NavMenuItem> menuItems;
 
         public MenuPage ()
@@ -322,9 +321,12 @@ namespace GraphTutorial
 }
 ```
 
+> [!NOTE]
+> Visual Studio は**MenuPage.xaml.cs**でエラーを報告します。 これらのエラーは、後の手順で解決されます。
+
 #### <a name="implement-the-welcome-page"></a>ウェルカムページを実装する
 
-**graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいアイテム**] の順に選択します。[**コンテンツ] ページ**を選択し`WelcomePage`、ページに名前を指定します。 **[追加]** を選択します。 **WelcomePage**ファイルを開き、その内容を次のように置き換えます。
+**Graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいアイテム**] の順に選択します。[**コンテンツ] ページ**を選択し`WelcomePage`、ページに名前を指定します。 **[追加]** を選択します。 **WelcomePage**ファイルを開き、その内容を次のように置き換えます。
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -378,7 +380,7 @@ private void OnSignIn(object sender, EventArgs e)
 
 #### <a name="add-calendar-page"></a>[予定表の追加] ページ
 
-ここで、予定表ページを追加します。 これは、現時点でのプレースホルダーにすぎません。 **graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいアイテム**] の順に選択します。[**コンテンツ] ページ**を選択し`CalendarPage`、ページに名前を指定します。 **[追加]** を選択します。
+ここで、予定表ページを追加します。 これは、現時点でのプレースホルダーにすぎません。 **Graphtutorial**プロジェクトを右クリックし、[**追加**]、[**新しいアイテム**] の順に選択します。[**コンテンツ] ページ**を選択し`CalendarPage`、ページに名前を指定します。 **[追加]** を選択します。
 
 追加したページを現在の状態のままにします。
 

@@ -9,12 +9,12 @@
 
 このチュートリアルを開始する前に、[開発モードがオンになっ](https://docs.microsoft.com/windows/uwp/get-started/enable-your-device-for-development)ている Windows 10 を実行しているコンピューターに[Visual Studio](https://visualstudio.microsoft.com/vs/)をインストールしておく必要があります。 Visual Studio を持っていない場合は、「ダウンロードオプション」の前のリンクにアクセスしてください。
 
-また、Xamarin は、Visual Studio のインストールの一部としてインストールする必要があります。 xamarin のインストールと構成の手順については、「 [xamarin のインストール](/xamarin/cross-platform/get-started/installation)」を参照してください。
+また、Xamarin は、Visual Studio のインストールの一部としてインストールする必要があります。 Xamarin のインストールと構成の手順については、「 [xamarin のインストール](/xamarin/cross-platform/get-started/installation)」を参照してください。
 
-必要に応じて、Visual Studio for mac がインストールされている mac にもアクセスできます。 アクセスできない場合でも、このチュートリアルを完了することはできますが、iOS 固有のセクションを完成させることはできません。
+必要に応じて、Visual Studio for Mac がインストールされている Mac にもアクセスできます。 アクセスできない場合でも、このチュートリアルを完了することはできますが、iOS 固有のセクションを完成させることはできません。
 
 > [!NOTE]
-> このチュートリアルは、visual studio 2017 バージョン15.9.6 および visual studio for Mac バージョン7.7.4 を使用して作成されています。 両方のコンピューターに Android SDK プラットフォーム27がインストールされています。 このガイドの手順は、他のバージョンでは動作しますが、テストされていません。
+> このチュートリアルは、Visual Studio 2019 バージョン16.1.0 および Visual Studio for Mac バージョン7.7.4 を使用して作成されています。 両方のコンピューターに Android SDK プラットフォーム28がインストールされています。 このガイドの手順は、他のバージョンでは動作しますが、テストされていません。
 
 ## <a name="feedback"></a>フィードバック
 

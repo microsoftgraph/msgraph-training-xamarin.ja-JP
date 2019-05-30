@@ -1,10 +1,10 @@
 <!-- markdownlint-disable MD002 MD041 -->
 
-この演習では、Microsoft Graph をアプリケーションに組み込みます。 このアプリケーションでは、microsoft [graph クライアントライブラリ](https://github.com/microsoftgraph/msgraph-sdk-dotnet)を使用して microsoft graph を呼び出すことにします。
+この演習では、Microsoft Graph をアプリケーションに組み込みます。 このアプリケーションでは、microsoft [Graph クライアントライブラリ](https://github.com/microsoftgraph/msgraph-sdk-dotnet)を使用して microsoft graph を呼び出すことにします。
 
 ## <a name="get-calendar-events-from-outlook"></a>Outlook から予定表のイベントを取得する
 
-最初に、 **graphtutorial .xaml**ファイルを**graphtutorial**プロジェクトに更新します。 ファイルを開き、その内容を次のように置き換えます。
+最初に、 **Graphtutorial .xaml**ファイルを**graphtutorial**プロジェクトに更新します。 ファイルを開き、その内容を次のように置き換えます。
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -60,7 +60,7 @@ protected override async void OnAppearing()
 
 ## <a name="display-the-results"></a>結果を表示する
 
-これで、JSON ダンプを、ユーザーにわかりやすい方法で結果を表示するためのものに置き換えることができます。 最初に、[バインド値コンバータ](/xamarin/xamarin-forms/xaml/xaml-basics/data-binding-basics#binding-value-converters)を作成して、Microsoft Graph によって返される[dateTimeTimeZone](/graph/api/resources/datetimetimezone?view=graph-rest-1.0)値をユーザーが想定する日付と時刻の形式に変換します。 **graphtutorial**プロジェクトの [**モデル**] フォルダーを右クリックし、[**新規作成**]、[**クラス.**..] の順に選択します。クラス`GraphDateTimeTimeZoneConverter`の名前を指定して、[**追加**] を選択します。 ファイルの内容全体を次のように置き換えます。
+これで、JSON ダンプを、ユーザーにわかりやすい方法で結果を表示するためのものに置き換えることができます。 最初に、[バインド値コンバータ](/xamarin/xamarin-forms/xaml/xaml-basics/data-binding-basics#binding-value-converters)を作成して、Microsoft Graph によって返される[dateTimeTimeZone](/graph/api/resources/datetimetimezone?view=graph-rest-1.0)値をユーザーが想定する日付と時刻の形式に変換します。 **Graphtutorial**プロジェクトの [**モデル**] フォルダーを右クリックし、[**追加**]、[**クラス.**..] の順に選択します。クラス`GraphDateTimeTimeZoneConverter`の名前を指定して、[**追加**] を選択します。 ファイルの内容全体を次のように置き換えます。
 
 ```cs
 using Microsoft.Graph;
@@ -115,7 +115,7 @@ namespace GraphTutorial.Models
     <ContentPage.Content>
         <StackLayout>
             <ListView x:Name="CalendarList"
-                      VerticalOptions="StartAndExpand"
+                      HasUnevenRows="true"
                       Margin="10,10,10,10">
                 <ListView.ItemTemplate>
                     <DataTemplate>
