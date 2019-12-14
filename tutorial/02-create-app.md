@@ -23,15 +23,15 @@ Visual Studio を開き、[**新しいプロジェクトの作成**] を選択�
 [**ツール > NuGet パッケージマネージャー > パッケージマネージャーコンソール**] を選択します。 パッケージマネージャーコンソールで、次のコマンドを入力します。
 
 ```Powershell
-Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial
-Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial.Android
-Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial.iOS
-Install-Package Microsoft.Graph -Version 1.15.0 -Project GraphTutorial
+Install-Package Microsoft.Identity.Client -Version 4.7.1 -Project GraphTutorial
+Install-Package Microsoft.Identity.Client -Version 4.7.1 -Project GraphTutorial.Android
+Install-Package Microsoft.Identity.Client -Version 4.7.1 -Project GraphTutorial.iOS
+Install-Package Microsoft.Graph -Version 1.20.0 -Project GraphTutorial
 ```
 
 ## <a name="design-the-app"></a>アプリを設計する
 
-最初に、認証`App`の状態とサインインしているユーザーを追跡するための変数を追加するクラスを更新します。 **ソリューションエクスプローラー**で、 **graphtutorial**プロジェクトを展開し、app.xaml ファイル**** を展開します。 **App.xaml.cs**ファイルを開き、次`using`のステートメントをファイルの先頭に追加します。
+最初に、認証`App`の状態とサインインしているユーザーを追跡するための変数を追加するクラスを更新します。 **ソリューションエクスプローラー**で、 **graphtutorial**プロジェクトを展開**し、app.xaml ファイルを**展開します。 **App.xaml.cs**ファイルを開き、次`using`のステートメントをファイルの先頭に追加します。
 
 ```cs
 using System.ComponentModel;
