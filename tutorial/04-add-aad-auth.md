@@ -2,190 +2,78 @@
 
 この演習では、Azure AD での認証をサポートするために、前の手順で作成したアプリケーションを拡張します。 これは、Microsoft Graph を呼び出すために必要な OAuth アクセストークンを取得するために必要です。 この手順では、 [.net 用 Microsoft Authentication Library (MSAL)](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet)をアプリケーションに統合します。
 
-**ソリューションエクスプローラー**で、 **graphtutorial**プロジェクトを展開し、[**モデル**] フォルダーを右クリックします。 [ **Add > Class...**.] を選択します。クラス`OAuthSettings`の名前を指定して、[**追加**] を選択します。 **OAuthSettings.cs**ファイルを開き、その内容を次のように置き換えます。
+1. **ソリューションエクスプローラー**で、 **graphtutorial**プロジェクトを展開し、[**モデル**] フォルダーを右クリックします。 [ **Add > Class...**.] を選択します。クラス`OAuthSettings`の名前を指定して、[**追加**] を選択します。
 
-```cs
-namespace GraphTutorial.Models
-{
-    public static class OAuthSettings
-    {
-        public const string ApplicationId = "YOUR_APP_ID_HERE";
-        public const string Scopes = "User.Read Calendars.Read";
-    }
-}
-```
+1. **OAuthSettings.cs**ファイルを開き、その内容を次のように置き換えます。
 
-を`YOUR_APP_ID_HERE`アプリ登録のアプリケーション ID に置き換えます。
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/Models/OAuthSettings.cs.example":::
 
-> [!IMPORTANT]
-> Git などのソース管理を使用している場合は、この時点で、ソース管理`OAuthSettings.cs`からファイルを除外して、アプリ ID が誤ってリークしないようにすることをお勧めします。
+1. を`YOUR_APP_ID_HERE`アプリ登録のアプリケーション ID に置き換えます。
+
+    > [!IMPORTANT]
+    > Git などのソース管理を使用している場合は、この時点で、ソース管理`OAuthSettings.cs`からファイルを除外して、アプリ ID が誤ってリークしないようにすることをお勧めします。
 
 ## <a name="implement-sign-in"></a>サインインの実装
 
-**Graphtutorial**プロジェクトで`using` **App.xaml.cs**ファイルを開き、次のステートメントをファイルの先頭に追加します。
+1. **Graphtutorial**プロジェクトで`using` **App.xaml.cs**ファイルを開き、次のステートメントをファイルの先頭に追加します。
 
-```cs
-using GraphTutorial.Models;
-using Microsoft.Identity.Client;
-using Microsoft.Graph;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http.Headers;
-```
+    ```csharp
+    using GraphTutorial.Models;
+    using Microsoft.Identity.Client;
+    using Microsoft.Graph;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Net.Http.Headers;
+    ```
 
-**アプリケーション**の名前の競合を解決するには、 **App**クラス宣言行を変更します。
+1. **アプリケーション**の名前の競合を解決するには、 **App**クラス宣言行を変更します。
 
-```cs
-public partial class App : Xamarin.Forms.Application, INotifyPropertyChanged
-```
+    ```csharp
+    public partial class App : Xamarin.Forms.Application, INotifyPropertyChanged
+    ```
 
-次のプロパティを`App`クラスに追加します。
+1. 次のプロパティを`App`クラスに追加します。
 
-```cs
-// UIParent used by Android version of the app
-public static object AuthUIParent = null;
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/App.xaml.cs" id="AuthPropertiesSnippet":::z
 
-// Keychain security group used by iOS version of the app
-public static string iOSKeychainSecurityGroup = null;
+1. 次に、 `App`クラスの`PublicClientApplication`コンストラクターで新しいを作成します。
 
-// Microsoft Authentication client for native/mobile apps
-public static IPublicClientApplication PCA;
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/App.xaml.cs" id="AppConstructorSnippet" highlight="5-14":::
 
-// Microsoft Graph client
-public static GraphServiceClient GraphClient;
+1. を使用`SignIn`して`PublicClientApplication`アクセストークンを取得するように関数を更新します。 行の`await GetUserInfo();`上に次のコードを追加します。
 
-// Microsoft Graph permissions used by app
-private readonly string[] Scopes = OAuthSettings.Scopes.Split(' ');
-```
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/App.xaml.cs" id="GetTokenSnippet":::
 
-次に、 `App`クラスの`PublicClientApplication`コンストラクターで新しいを作成します。
+    このコードでは、最初にアクセストークンを暗黙的に取得しようとします。 ユーザーの情報がアプリのキャッシュに既に存在している場合 (たとえば、ユーザーが以前にサインアウトせずにそのアプリを閉じた場合)、これは成功し、ユーザーに確認を求める理由はありません。 キャッシュ内にユーザーの情報がない場合、この関数は`AcquireTokenSilent().ExecuteAsync()`をスロー `MsalUiRequiredException`します。 この場合、コードは interactive 関数を呼び出してトークンを`AcquireTokenInteractive`取得します。
 
-```cs
-public App()
-{
-    InitializeComponent();
+1. `SignOut`関数を更新して、キャッシュからユーザーの情報を削除します。 次のコードを`SignOut`関数の先頭に追加します。
 
-    var builder = PublicClientApplicationBuilder
-        .Create(OAuthSettings.ApplicationId);
-
-    if (!string.IsNullOrEmpty(iOSKeychainSecurityGroup))
-    {
-        builder = builder.WithIosKeychainSecurityGroup(iOSKeychainSecurityGroup);
-    }
-
-    PCA = builder.Build();
-
-    MainPage = new MainPage();
-}
-```
-
-では、 `SignIn`を使用して`PublicClientApplication`アクセストークンを取得するように関数を更新します。 行の`await GetUserInfo();`上に次のコードを追加します。
-
-```cs
-// First, attempt silent sign in
-// If the user's information is already in the app's cache,
-// they won't have to sign in again.
-try
-{
-    var accounts = await PCA.GetAccountsAsync();
-
-    var silentAuthResult = await PCA
-        .AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
-        .ExecuteAsync();
-
-    Debug.WriteLine("User already signed in.");
-    Debug.WriteLine($"Successful silent authentication for: {silentAuthResult.Account.Username}");
-    Debug.WriteLine($"Access token: {silentAuthResult.AccessToken}");
-}
-catch (MsalUiRequiredException msalEx)
-{
-    // This exception is thrown when an interactive sign-in is required.
-    Debug.WriteLine("Silent token request failed, user needs to sign-in: " + msalEx.Message);
-    // Prompt the user to sign-in
-    var interactiveRequest = PCA.AcquireTokenInteractive(Scopes);
-
-    if (AuthUIParent != null)
-    {
-        interactiveRequest = interactiveRequest
-            .WithParentActivityOrWindow(AuthUIParent);
-    }
-
-    var interactiveAuthResult = await interactiveRequest.ExecuteAsync();
-    Debug.WriteLine($"Successful interactive authentication for: {interactiveAuthResult.Account.Username}");
-    Debug.WriteLine($"Access token: {interactiveAuthResult.AccessToken}");
-}
-catch (Exception ex)
-{
-    Debug.WriteLine("Authentication failed. See exception messsage for more details: " + ex.Message);
-}
-```
-
-このコードでは、最初にアクセストークンを暗黙的に取得しようとします。 ユーザーの情報がアプリのキャッシュに既に存在している場合 (たとえば、ユーザーが以前にサインアウトせずにそのアプリを閉じた場合)、これは成功し、ユーザーに確認を求める理由はありません。 キャッシュ内にユーザーの情報がない場合、この関数は`AcquireTokenSilent().ExecuteAsync()`をスロー `MsalUiRequiredException`します。 この場合、コードは interactive 関数を呼び出してトークンを`AcquireTokenInteractive`取得します。
-
-次に、 `SignOut`キャッシュからユーザーの情報を削除するように関数を更新します。 次のコードを`SignOut`関数の先頭に追加します。
-
-```cs
-// Get all cached accounts for the app
-// (Should only be one)
-var accounts = await PCA.GetAccountsAsync();
-while (accounts.Any())
-{
-    // Remove the account info from the cache
-    await PCA.RemoveAsync(accounts.First());
-    accounts = await PCA.GetAccountsAsync();
-}
-```
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/App.xaml.cs" id="RemoveAccountSnippet":::
 
 ### <a name="update-android-project-to-enable-sign-in"></a>Android プロジェクトを更新してサインインを有効にする
 
 Xamarin Android プロジェクトで使用されている場合、Microsoft 認証ライブラリには[Android 固有](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Xamarin-Android-specifics)のいくつかの要件があります。
 
-最初に、Android マニフェストを更新してリダイレクト URI を登録する必要があります。 **Graphtutorial. Android**プロジェクトで、 **Properties**フォルダーを展開し、 **androidmanifest**を開きます。 Visual Studio for Mac を使用している場合は、ファイルの下部にあるタブを使用して、**ソース**ビューに切り替えます。 内容全体を次のように置き換えます。
+1. **Graphtutorial. Android**プロジェクトで、 **Properties**フォルダーを展開し、 **androidmanifest**を開きます。 Visual Studio for Mac を使用している場合は、[ **Androidmanifest** ] を制御し、[ファイルを**開く**]、[**ソースコードエディター**] の順に選択します。 内容全体を次のように置き換えます。
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.companyname.GraphTutorial">
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
-    <application android:label="GraphTutorial.Android">
-        <activity android:name="microsoft.identity.client.BrowserTabActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="msalYOUR_APP_ID_HERE" android:host="auth" />
-            </intent-filter>
-        </activity>
-    </application>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-</manifest>
-```
+    :::code language="xml" source="../demo/GraphTutorial/GraphTutorial.Android/Properties/AndroidManifest.xml":::
 
-を`YOUR_APP_ID_HERE`アプリ登録のアプリケーション ID で置き換えます。
+1. **MainActivity.cs**を開き、次`using`のステートメントをファイルの先頭に追加します。
 
-次に、 **MainActivity.cs**を開き、次`using`のステートメントをファイルの先頭に追加します。
+    ```csharp
+    using Android.Content;
+    using Microsoft.Identity.Client;
+    ```
 
-```cs
-using Microsoft.Identity.Client;
-using Android.Content;
-```
+1. 関数を`OnActivityResult`上書きして、msal ライブラリに制御を渡します。 次のものを`MainActivity`クラスに追加します。
 
-その後、関数`OnActivityResult`を上書きして、msal ライブラリに制御を渡します。 次のものを`MainActivity`クラスに追加します。
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial.Android/MainActivity.cs" id="OnActivityResultSnippet":::
 
-```cs
-protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
-{
-    base.OnActivityResult(requestCode, resultCode, data);
-    AuthenticationContinuationHelper
-        .SetAuthenticationContinuationEventArgs(requestCode, resultCode, data);
-}
-```
+1. `OnCreate`関数で、行の`LoadApplication(new App());`後に次の行を追加します。
 
-最後に、 `OnCreate`関数の行の`LoadApplication(new App());`後に次の行を追加します。
-
-```cs
-App.AuthUIParent = this;
-```
+    ```csharp
+    App.AuthUIParent = this;
+    ```
 
 ### <a name="update-ios-project-to-enable-sign-in"></a>IOS プロジェクトを更新してサインインを有効にする
 
@@ -194,45 +82,30 @@ App.AuthUIParent = this;
 
 Xamarin iOS プロジェクトで使用されている場合、Microsoft 認証ライブラリには[iOS 固有](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Xamarin-iOS-specifics)のいくつかの要件があります。
 
-最初に、キーチェーンアクセスを有効にする必要があります。 ソリューションエクスプローラーで、 **Graphtutorial. iOS**プロジェクトを展開し、**資格**ファイルを開きます。 **キーチェーン**の資格を見つけ、[**キーチェーンを有効にする**] を選択します。 **キーチェーングループ**で、という形式`com.YOUR_DOMAIN.GraphTutorial`のエントリを追加します。
+1. ソリューションエクスプローラーで、 **Graphtutorial. iOS**プロジェクトを展開し、**資格**ファイルを開きます。
 
-![キーチェーン資格の構成のスクリーンショット](./images/enable-keychain-access.png)
+1. **キーチェーン**の資格を見つけ、[**キーチェーンを有効にする**] を選択します。
 
-次に、アプリが処理する URL の種類として、既定の MSAL リダイレクト URI を登録する必要があります。 **情報**ファイルを開き、次のように変更します。
+1. **キーチェーングループ**で、という形式`com.companyname.GraphTutorial`のエントリを追加します。
 
-- [**アプリケーション**] タブで、[**バンドル識別子**] の値が、[利用**資格**] の**キーチェーングループ**に設定した値と一致していることを確認します。 そうでない場合は、今すぐ更新してください。
-- [**詳細設定**] タブで、[ **URL の種類**] セクションを探します。 URL の種類を次の値で追加します。
-  - **識別子**:**バンドル識別子**の値を設定します。
-  - **URL スキーム**: に`msal{YOUR-APP-ID}`設定します。 たとえば、アプリ ID が`67ad5eba-0cfc-414d-8f9f-0a6d973a907c`である場合は、をに`msal67ad5eba-0cfc-414d-8f9f-0a6d973a907c`設定します。
-  - **役割**:`Editor`
-  - **アイコン**: 空のままにします
+    ![キーチェーン資格の構成のスクリーンショット](./images/enable-keychain-access.png)
 
-![情報の [URL の種類] セクションのスクリーンショット](./images/add-url-type.png)
+1. 「 **Graphtutorial** 」プロジェクトのコードを更新して、認証中にリダイレクトを処理するようにします。 **AppDelegate.cs**ファイルを開き、次`using`のステートメントをファイルの先頭に追加します。
 
-最後に、認証中にリダイレクトを処理するように、 **Graphtutorial. iOS**プロジェクトのコードを更新します。 **AppDelegate.cs**ファイルを開き、次`using`のステートメントをファイルの先頭に追加します。
+    ```csharp
+    using Microsoft.Identity.Client;
+    ```
 
-```cs
-using Microsoft.Identity.Client;
-```
+1. 行の`LoadApplication(new App());`直前に、 `FinishedLaunching`次の行を追加します。
 
-行の`LoadApplication(new App());`直前に、 `FinishedLaunching`次の行を追加します。
+    ```csharp
+    // Specify the Keychain access group
+    App.iOSKeychainSecurityGroup = NSBundle.MainBundle.BundleIdentifier;
+    ```
 
-```cs
-// Specify the Keychain access group
-App.iOSKeychainSecurityGroup = NSBundle.MainBundle.BundleIdentifier;
-```
+1. MSAL `OpenUrl`ライブラリに URL を渡す関数を上書きします。 次のものを`AppDelegate`クラスに追加します。
 
-最後に、 `OpenUrl`関数を上書きして、msal ライブラリに URL を渡します。 次のものを`AppDelegate`クラスに追加します。
-
-```cs
-// Handling redirect URL
-// See: https://github.com/azuread/microsoft-authentication-library-for-dotnet/wiki/Xamarin-iOS-specifics
-public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
-{
-    AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
-    return true;
-}
-```
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial.iOS/AppDelegate.cs" id="OpenUrlSnippet":::
 
 ## <a name="storing-the-tokens"></a>トークンの格納
 
@@ -244,72 +117,28 @@ Microsoft 認証ライブラリを Xamarin プロジェクトで使用する場�
 
 ![Visual Studio の [出力] ウィンドウのスクリーンショット](./images/debugger-access-token.png)
 
-## <a name="get-user-details"></a>ユーザーの詳細を取得する
+## <a name="get-user-details"></a>ユーザーの詳細情報を取得する
 
-**アプリ**クラスに新しい関数を追加して、 `GraphServiceClient`を初期化します。
+1. **アプリ**クラスに新しい関数を追加して、 `GraphServiceClient`を初期化します。
 
-```cs
-private async Task InitializeGraphClientAsync()
-{
-    var currentAccounts = await PCA.GetAccountsAsync();
-    try
-    {
-        if (currentAccounts.Count() > 0)
-        {
-            // Initialize Graph client
-            GraphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
-                async (requestMessage) =>
-                {
-                    var result = await PCA.AcquireTokenSilent(Scopes, currentAccounts.FirstOrDefault())
-                        .ExecuteAsync();
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/App.xaml.cs" id="InitializeGraphClientSnippet":::
 
-                    requestMessage.Headers.Authorization =
-                        new AuthenticationHeaderValue("Bearer", result.AccessToken);
-                }));
+1. App.xaml.cs の`SignIn`関数を**App.xaml.cs** 、ではなく、この関数`GetUserInfo`を呼び出すように更新します。 次のものを`SignIn`関数から削除します。
 
-            await GetUserInfo();
+    ```csharp
+    await GetUserInfo();
 
-            IsSignedIn = true;
-        }
-        else
-        {
-            IsSignedIn = false;
-        }
-    }
-    catch(Exception ex)
-    {
-        Debug.WriteLine(
-            $"Failed to initialized graph client. Accounts in the msal cache: {currentAccounts.Count()}. See exception message for details: {ex.Message}");
-    }
-}
-```
+    IsSignedIn = true;
+    ```
 
-App.xaml.cs の関数`SignIn`を、 **** ではなく、この関数を`GetUserInfo`呼び出すように更新します。 次のものを`SignIn`関数から削除します。
+1. 次のものを`SignIn`関数の末尾に追加します。
 
-```cs
-await GetUserInfo();
+    ```csharp
+    await InitializeGraphClientAsync();
+    ```
 
-IsSignedIn = true;
-```
+1. 関数を`GetUserInfo`更新して、Microsoft Graph からユーザーの詳細を取得します。 既存の `GetUserInfo` 関数を、以下の関数で置き換えます。
 
-次のものを`SignIn`関数の末尾に追加します。
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/App.xaml.cs" id="GetUserInfoSnippet":::
 
-```cs
-await InitializeGraphClientAsync();
-```
-
-次に、 `GetUserInfo`関数を更新して、Microsoft Graph からユーザーの詳細を取得します。 既存の `GetUserInfo` 関数を、以下の関数で置換します。
-
-```cs
-private async Task GetUserInfo()
-{
-    // Get the logged on user's profile (/me)
-    var user = await GraphClient.Me.Request().GetAsync();
-
-    UserPhoto = ImageSource.FromStream(() => GetUserPhoto());
-    UserName = user.DisplayName;
-    UserEmail = string.IsNullOrEmpty(user.Mail) ? user.UserPrincipalName : user.Mail;
-}
-```
-
-変更を保存してすぐにアプリを実行すると、サインイン後にユーザーの表示名と電子メールアドレスで UI が更新されます。
+1. 変更内容を保存し、アプリケーションを実行します。 サインイン後、ユーザーの表示名と電子メールアドレスで UI が更新されます。
