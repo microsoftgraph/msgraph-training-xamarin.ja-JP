@@ -3,24 +3,24 @@
 このチュートリアルでは、Microsoft Graph API を使用してユーザーの予定表情報を取得する Xamarin アプリを構築する方法について説明します。
 
 > [!TIP]
-> 完成したチュートリアルをダウンロードするだけで済む場合は、 [GitHub リポジトリ](https://github.com/microsoftgraph/msgraph-training-xamarin)をダウンロードするか、クローンを作成できます。
+> 完成したチュートリアルをダウンロードするだけの場合は [、GitHub](https://github.com/microsoftgraph/msgraph-training-xamarin)リポジトリをダウンロードまたは複製できます。
 
 ## <a name="prerequisites"></a>前提条件
 
-このチュートリアルを開始する前に、[開発モードがオンになっ](https://docs.microsoft.com/windows/uwp/get-started/enable-your-device-for-development)ている Windows 10 を実行しているコンピューターに[Visual Studio](https://visualstudio.microsoft.com/vs/)をインストールしておく必要があります。 Visual Studio を持っていない場合は、「ダウンロードオプション」の前のリンクにアクセスしてください。
+このチュートリアルを開始する前に、開発者モード [Visual Studio](https://visualstudio.microsoft.com/vs/) Windows 10 を実行しているコンピューターにインストールされている必要 [があります](https://docs.microsoft.com/windows/uwp/get-started/enable-your-device-for-development)。 ダウンロード オプションがない場合Visual Studioダウンロード オプションについては、前のリンクを参照してください。
 
-また、Xamarin は、Visual Studio のインストールの一部としてインストールする必要があります。 Xamarin のインストールと構成の手順については、「 [xamarin のインストール](/xamarin/cross-platform/get-started/installation)」を参照してください。
+また、Xamarin をインストールの一部としてインストールVisual Studioがあります。 Xamarin [のインストールと構成の手順については、「Xamarin](/xamarin/cross-platform/get-started/installation) のインストール」を参照してください。
 
-必要に応じて、Visual Studio for Mac がインストールされている Mac にもアクセスできます。 アクセスできない場合でも、このチュートリアルを完了することはできますが、iOS 固有のセクションを完成させることはできません。
+必要に応じて、Mac 用アプリがインストールされた Mac Visual Studioアクセスできる必要があります。 アクセス権を持たない場合でも、このチュートリアルを完了できますが、iOS 固有のセクションを完了できません。
 
-また、Outlook.com 上のメールボックスを持つ個人の Microsoft アカウント、または Microsoft 職場または学校のアカウントを所有している必要があります。 Microsoft アカウントを持っていない場合は、無料のアカウントを取得するためのオプションがいくつかあります。
+また、メールボックスを持つ個人用の Microsoft アカウントが Outlook.com Microsoft の仕事用アカウントまたは学校アカウントである必要があります。 Microsoft アカウントをお持ちない場合は、無料アカウントを取得するためのオプションが 2 つ提供されています。
 
-- [新しい個人用 Microsoft アカウントにサインアップ](https://signup.live.com/signup?wa=wsignin1.0&rpsnv=12&ct=1454618383&rver=6.4.6456.0&wp=MBI_SSL_SHARED&wreply=https://mail.live.com/default.aspx&id=64855&cbcxt=mai&bk=1454618383&uiflavor=web&uaid=b213a65b4fdc484382b6622b3ecaa547&mkt=E-US&lc=1033&lic=1)することができます。
-- [Office 365 開発者プログラムにサインアップ](https://developer.microsoft.com/office/dev-program)して、無料の office 365 サブスクリプションを取得することができます。
+- 新しい [個人用 Microsoft アカウントにサインアップできます](https://signup.live.com/signup?wa=wsignin1.0&rpsnv=12&ct=1454618383&rver=6.4.6456.0&wp=MBI_SSL_SHARED&wreply=https://mail.live.com/default.aspx&id=64855&cbcxt=mai&bk=1454618383&uiflavor=web&uaid=b213a65b4fdc484382b6622b3ecaa547&mkt=E-US&lc=1033&lic=1)。
+- Office [365 開発者プログラムにサインアップして、365](https://developer.microsoft.com/office/dev-program) サブスクリプションを無料Office取得できます。
 
 > [!NOTE]
-> このチュートリアルは、Visual Studio 2019 バージョン16.5.2 および Visual Studio for Mac バージョン8.5.1 を使用して作成されています。 両方のコンピューターに Android SDK プラットフォーム28がインストールされています。 このガイドの手順は、他のバージョンでは動作しますが、テストされていません。
+> このチュートリアルは、Visual Studio 2019 バージョン 16.8.3 および Visual Studio for Mac バージョン 8.5.1 で記述されました。 どちらのコンピューターにも、Android SDK プラットフォーム 28 がインストールされています。 このガイドの手順は他のバージョンでも動作する可能性がありますが、テストは行ってはいではありません。
 
 ## <a name="feedback"></a>フィードバック
 
-このチュートリアルに関するフィードバックは、 [GitHub リポジトリ](https://github.com/microsoftgraph/msgraph-training-xamarin)に記入してください。
+このチュートリアルに関するフィードバックは [、GitHub リポジトリで提供してください](https://github.com/microsoftgraph/msgraph-training-xamarin)。
