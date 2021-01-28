@@ -32,6 +32,10 @@
     using System.ComponentModel;
     ```
 
+1. 次の関数をクラスに追加して、ユーザーのタイム ゾーンで現在の週の開始 `CalendarPage` を取得します。
+
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/CalendarPage.xaml.cs" id="GetStartOfWeekSnippet":::
+
 1. 次の関数をクラスに追加して、ユーザーのイベントを取得し `CalendarPage` 、JSON 応答を表示します。
 
     ```csharp
