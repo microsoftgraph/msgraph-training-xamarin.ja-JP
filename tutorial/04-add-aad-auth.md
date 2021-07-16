@@ -6,7 +6,7 @@
 
 1. **OAuthSettings.cs** ファイルを開き、その内容を次に置き換えてください。
 
-    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/Models/OAuthSettings.cs.example":::
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/Models/OAuthSettings.example.cs":::
 
 1. アプリ `YOUR_APP_ID_HERE` 登録のアプリケーション ID に置き換える。
 
